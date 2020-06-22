@@ -240,5 +240,4 @@ class Simulator():
             self.loss=self.QN.replay(self.memory,self.batch_num,self.gamma,targetQN)
             self.actor.reduce_epsilon()
 
-            
         return total_reward, self.loss 

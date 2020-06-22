@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # coding: utf-8
 import daqmx
 import numpy as np
