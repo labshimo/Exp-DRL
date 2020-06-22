@@ -71,7 +71,7 @@ class ExpFlowSeparation():
         samp_clk_terminal = '/Dev1/Ctr0InternalOutput'
 
         self.read_task.ai_channels.add_ai_voltage_chan(self.input_channel, max_val=10, min_val=-10)
-        self.read_task.timing.cfg_samp_clk_timing(self.sample_rate/10, source=samp_clk_terminal, active_edge=Edge.FALLING,sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=self.number_of_samples/10)
+        self.read_task.timing.cfg_samp_clk_timing(self.sample_rate, source=samp_clk_terminal, active_edge=Edge.FALLING,sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=self.number_of_samples)
 
         self.write_task.ao_channels.add_ao_voltage_chan(self.output_channel, max_val=10, min_val=-10)
         self.write_task.timing.cfg_samp_clk_timing(self.sample_rate, source=samp_clk_terminal, active_edge=Edge.FALLING,sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=self.number_of_samples)
