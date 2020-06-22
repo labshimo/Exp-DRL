@@ -52,11 +52,7 @@ def main(image):
     save_args(args)
     
     manager = R2D2Manager(num_actors=args["agent"]["num_actors"], args=args)
-    if args["agent"]["test"]:
-        agent = manager.train()
-        agent.run_simlator()
-    else:
-        manager.train()
+    manager.train()
 
 if __name__ == '__main__':
     main(image=True)

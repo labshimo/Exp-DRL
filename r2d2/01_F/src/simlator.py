@@ -22,8 +22,12 @@ class SeparationControl():
         self.before_reward     = 0 
         self.attachment_count  = 0
         self.a_buffer          = np.zeros(self.nb_actions)
-        self.data_path         = args["log_dir"] + "data/"
-        self.run_path          = args["log_dir"] + "run/"
+        if not args["test"]:
+            self.data_path         = args["log_dir"] + "data/"
+            self.run_path          = args["log_dir"] + "run/"
+        else:
+            self.data_path         = args["test_dir"] + "data/"
+            self.run_path          = args["test_dir"] + "run/"
 
         if not (os.path.exists(self.data_path) or os.path.exists(self.run_path)):
             os.makedirs(self.data_path)

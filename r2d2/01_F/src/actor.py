@@ -29,7 +29,10 @@ class Actor():
         **kwargs):
         super(Actor, self).__init__(**kwargs)
         self.actor_index               = actor_index
-        self.epsilon                   = epsilon
+        if not args["test"]:
+            self.epsilon               = epsilon
+        else:
+            self.epsilon               = 0
         self.experience_q              = experience_q
         self.model_sync_q              = model_sync_q
         self.nb_actions                = simlator.nb_actions
@@ -45,8 +48,10 @@ class Actor():
         self.rescaling_epsilon         = args["rescaling_epsilon"]
         self.priority_exponent         = args["priority_exponent"]
         self.per_alpha                 = args["per_alpha"]
-        self.training_num              = args["training_number"]
-        self.test_num                  = args["test_number"]
+        if not args["test"]:
+            self.episode_num          = args["training_number"]
+        else:
+            self.episode_num          = args["test_number"]
         self.burn_in_length            = args["burnin_length"]
         self.sequence_length           = args["sequence_length"]
         self.overlap_length            = args["overlap_length"]
@@ -91,15 +96,8 @@ class Actor():
             f=time.time()
             print("elapsed time = {0:05f}".format((f-s)))
 
-    def run_actor(self):
-        # training
-        '''for i in range(self.training_num):
-            self.run_simlator()
-
-        print("Actor", self.actor_index, "is Over.")
-        time.sleep(0.5)'''
-        
-        while self.episode < self.training_num:
+    def run_actor(self):        
+        while self.episode < self.episode_num:
             try:
                 self.run_simlator()
             except:
@@ -107,7 +105,7 @@ class Actor():
                 self.simlator.stop()
                 
         print("Actor", self.actor_index, "is Over.")
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     def get_initial_state(self, observation):
         state     = [np.zeros(self.input_shape) for _ in range(self.input_sequence)]

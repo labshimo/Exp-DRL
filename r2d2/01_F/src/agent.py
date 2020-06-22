@@ -100,37 +100,30 @@ class R2D2Manager():
         
         # throw end to learner 
         self.learner_end_q[0].put(1)
-        if self.args["test"]:
-            # get weight from learner
-            print("Last Learner weights waiting...")
-            weights = self.learner_end_q[1].get(timeout=120)
-            print("weight got")
-            # test Actor
-            test_actor = Actor(
-                -1,
-                0,
-                self.model_tester_args,
-                self.args,
-                None,
-                None,
-                training = False,
-            )
-            test_actor.model.set_weights(weights)
-
-            # kill
-            self.learner_ps.terminate()
-            for p in self.actors_ps:
-                p.terminate()
-
-            return test_actor
-        else:
-            time.sleep(1)
-            # kill
-            self.learner_ps.terminate()
-            for p in self.actors_ps:
-                p.terminate()
+        time.sleep(1)
+        # kill
+        self.learner_ps.terminate()
+        for p in self.actors_ps:
+            p.terminate()
 
         return
+
+    def test(self):
+        # test Actor
+        test_actor = Actor(
+            self.simlator,
+            -1,
+            0,
+            self.model_tester_args,
+            self.args,
+            None,
+            None,
+            training = False,
+        )
+        test_actor.model.load_weights(self.args["log_dir"]+self.args["load_weights_path"])
+        test_actor.test()
+
+
 
 
     #---------------------------------------------------
@@ -170,9 +163,9 @@ class R2D2Manager():
         )
         try:
             # model load
-            if os.path.isfile(args["load_weights_path"]):
-                learner.model.load_weights(args["load_weights_path"])
-                learner.target_model.load_weights(args["load_weights_path"])
+            if os.path.isfile(self.args["log_dir"]+self.args["load_weights_path"]):
+                learner.model.load_weights(self.args["log_dir"]+self.args["load_weights_path"])
+                learner.target_model.load_weights(self.args["log_dir"]+self.args["load_weights_path"])
 
             # learning
             print("Learner Starts")
@@ -185,14 +178,15 @@ class R2D2Manager():
         finally:
             print("Learning End. Train Count:{}".format(learner.train_num))
 
-            # model save
-            if args["save_weights_path"] != "":
-                print("save:" + args["save_weights_path"])
-                learner.model.save_weights(args["log_dir"]+args["save_weights_path"], args["save_overwrite"])
+            
             if self.args["test"]:
-                # throw end to learner
+                # model save
+                if args["save_weights_path"] != "":
+                    print("save:" + args["save_weights_path"])
+                    learner.model.save_weights(args["log_dir"]+args["save_weights_path"], args["save_overwrite"])
+                '''# throw end to learner
                 print("Last Learner weights sending...")
-                learner_end_q[1].put(learner.model.get_weights())
+                learner_end_q[1].put(learner.model.get_weights())'''
 
     def actor_run_cpu(
         self,
@@ -237,11 +231,13 @@ class R2D2Manager():
                 args,
                 experience_q,
                 model_sync_q,
+                training = args["test"]
             )
 
             # model load
-            if os.path.isfile( args["load_weights_path"] ):
-                actor.model.load_weights(args["load_weights_path"])
+            print(self.args["log_dir"]+self.args["load_weights_path"])
+            if os.path.isfile(self.args["log_dir"]+self.args["load_weights_path"]):
+                actor.model.load_weights(self.args["log_dir"]+self.args["load_weights_path"])
 
             # start
             actor.run_actor()
