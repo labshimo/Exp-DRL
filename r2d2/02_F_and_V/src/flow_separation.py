@@ -64,7 +64,7 @@ class ExpFlowSeparation():
     def create_burst_wave(self,characteristics):
         ### example -> burst_freq=600[Hz], burst_ratio=0.1[-], voltage=3[kV]
         base_frequency  = characteristics["base_frequency"]
-        burst_frequency = characteristics["base_frequency"]
+        burst_frequency = characteristics["burst_frequency"]
         burst_ratio     = characteristics["burst_ratio"]
         voltage         = characteristics["voltage"]
         time            = np.linspace(0.0, self.dt, self.number_of_samples)
