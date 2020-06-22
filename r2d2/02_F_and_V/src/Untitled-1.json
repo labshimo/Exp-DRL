@@ -62,11 +62,8 @@
         "dynamic_pressure": 57,
         "reward_indicator": -0.55,
         "number_average": 10,
-        "plasma_actuator_csv": "../csv/PA120-2.csv",
-        "nb_actions": 2,
-        "base_frequency": 12000,
-        "burst_frequnecy": 600,
-        "voltage": 3,
-        "actions": [[100,3],[600,3]]
+        "mode": "gate",
+        "gate_mode": {"plasma_actuator_csv": "../csv/PA120-2.csv"},
+        "sin_mode":  {"base_frequency": 12000,"burst_frequnecy": [100,200,600],"burst_ratio":[0.1],"voltage":[3,4]}
     }
 }
