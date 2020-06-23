@@ -231,7 +231,7 @@ class R2D2Manager():
                 args,
                 experience_q,
                 model_sync_q,
-                training = args["test"]
+                training = not (args["test"])
             )
 
             # model load

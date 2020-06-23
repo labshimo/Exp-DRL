@@ -125,6 +125,8 @@ class ExpFlowSeparation():
         return (((values_read / self.sens_coff) + self.dynamic_pressre ) / self.dynamic_pressre).T
         
     def _writing(self,action):
+        print(self.burst_wave[action].shape)
+        print(self.burst_wave[action])
         self.writer.write_many_sample(self.burst_wave[action])
     
     

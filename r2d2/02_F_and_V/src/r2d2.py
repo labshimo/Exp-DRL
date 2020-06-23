@@ -24,6 +24,7 @@ from PIL import Image, ImageDraw
 from noisedense import NoisyDense
 from memory import ReplayMemory, PERGreedyMemory, SumTree, PERProportionalMemory, PERRankBaseMemory
 from agent import R2D2Manager
+import sys
 
 #-----------------------------------------------------
 # NN可視化用
@@ -36,8 +37,8 @@ import cv2
 # main    
 #-----------------------------------------------------------
 
-def load_args():
-    with open("Untitled-1.json","r") as f:
+def load_args(filename):
+    with open(filename,"r") as f:
         args = json.load(f) 
     return args
 
@@ -47,8 +48,8 @@ def save_args(args):
 
 def main(image):
     global agent
-    
-    args = load_args()
+       
+    args = load_args(sys.argv[1])
     save_args(args)
     
     manager = R2D2Manager(num_actors=args["agent"]["num_actors"], args=args)

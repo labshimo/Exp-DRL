@@ -1,7 +1,6 @@
 # coding: utf-8
 import numpy as np
 from numpy import pi
-import time
 import os
 from collections import deque
 import csv
@@ -14,13 +13,12 @@ from nidaqmx.constants import (Edge, TriggerType, AcquisitionType, LineGrouping,
 from nidaqmx.utils import flatten_channel_string
 from nidaqmx.stream_readers import (AnalogSingleChannelReader, AnalogMultiChannelReader)
 from nidaqmx.stream_writers import (AnalogSingleChannelWriter, AnalogMultiChannelWriter)
-
+from scipy import signal
 class ExpFlowSeparation():
     def __init__(self, simlator_args):
         self.get_setting(simlator_args)
 
     def get_setting(self, arg):
-        self.arg               = arg
         # analog input
         self.sample_rate       = arg["sample_rate"]
         self.number_of_samples = arg["number_of_samples"] 
@@ -43,34 +41,31 @@ class ExpFlowSeparation():
         self.n_loop            = int(self.sample_rate*self.total_time/self.number_of_samples)
         # plama actuator 
         self.burst_wave        = self.get_burst_wave(arg)
-        self.nb_actions        = self.burst_wave.shape[0]
+        self.nb_actions        = self.burst_wave.shape[0] - 1 
 
-
-    def get_burst_wave(self,mod,arg):
-        if mode=="gate":
-            wave = get_gate_wave(arg["gate_mode"]["plasma_actuator_csv"])                        
-        else if mode=="sin":
-            wave = create_burst_wave(arg["mode"],arg["sin_mode"])
-        print("MODE: " + mode)
+    def get_burst_wave(self,arg):
+        if arg["mode"]=="gate":
+            wave = self.get_gate_wave(arg["gate_mode"]["plasma_actuator_csv"])                        
+        elif arg["mode"]=="sin":
+            wave = self.create_burst_wave(**arg["sin_mode"])
+        print("MODE: " + arg["mode"])
+        zero_wave  = np.zeros((1,self.number_of_samples))
+        wave       = np.append(zero_wave,wave,axis=0)
         return wave
 
     def get_gate_wave(self, filename):
-        wave    = np.zeros((self.1,self.number_of_samples))
-        df_wave = pd.read_csv(filename, header=None).values
-        wave    = np.append(wave,df_wave, axis=0) * 5
-        self.nb_actions = wave.shape[0] 
-        return wave
+        df_wave    = pd.read_csv(filename, header=None).values
+        np_wave    = np.array([ i_wave for i_wave in df_wave ])
+        return np_wave
 
-    def create_burst_wave(self,characteristics):
+    def create_burst_wave(self,base_frequency, burst_frequency, burst_ratio, voltage):
         ### example -> burst_freq=600[Hz], burst_ratio=0.1[-], voltage=3[kV]
-        base_frequency  = characteristics["base_frequency"]
-        burst_frequency = characteristics["burst_frequency"]
-        burst_ratio     = characteristics["burst_ratio"]
-        voltage         = characteristics["voltage"]
         time            = np.linspace(0.0, self.dt, self.number_of_samples)
-        tmp_sin         = np.sin(2*np.pi*base_frequency*time)
+        tmp_sin         = np.sin(2*np.pi*int(base_frequency)*time)
         tmp_sq          = [(signal.square(2 * np.pi * bf_i * time, duty=br_i)+1)/2 for br_i in burst_ratio for bf_i in burst_frequency]
         wave            = [(tmp_sin * tmp_sq_i) * vi for tmp_sq_i in tmp_sq for vi in voltage] 
+        zero_wave       = np.zeros((1,self.number_of_samples)) 
+        wave            = np.append(wave,zero_wave,axis=0)# plus off at last array
         return wave
 
     def load_args(self, filename):

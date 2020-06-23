@@ -98,12 +98,17 @@ class Actor():
 
     def run_actor(self):        
         while self.episode < self.episode_num:
-            try:
+            self.run_simlator()
+            '''try:
                 self.run_simlator()
-            except:
-                print('error!')
+            except Exception as e:
+                print ('=== error ===')
+                print ('type:' + str(type(e)))
+                print ('args:' + str(e.args))
+                #print ('message:' + e.message)
+                print ('e :' + str(e))
                 self.simlator.stop()
-                
+            '''    
         print("Actor", self.actor_index, "is Over.")
         time.sleep(0.1)
 
